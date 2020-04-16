@@ -2,32 +2,39 @@ package sample;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class Main extends Application {
 
+
+    public static Scene mainScene;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/MainView.fxml"));
+                ScrollPane scrollpane = loader.load();
 
-            Parent root = FXMLLoader.load(getClass().getResource("/gui/MainView.fxml"));
-            primaryStage.setTitle("Sample JavaFX Application");
-            primaryStage.setScene(new Scene(root, 300, 275));
-            primaryStage.show();
+                scrollpane.setFitToHeight(true);
+                scrollpane.setFitToWidth(true);
+
+                mainScene = new Scene(scrollpane);
 
 
-        }
+                primaryStage.setScene(mainScene);
 
-        catch(IOException e){
+                primaryStage.setTitle("Sample JavaFX application");
 
-            e.printStackTrace();
-
-        }
+                primaryStage.show();
+    }
+        catch (IOException e) {
+        e.printStackTrace();
+    }
 
 
     }
