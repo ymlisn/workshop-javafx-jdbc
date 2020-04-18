@@ -1,5 +1,6 @@
 package gui;
 
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
@@ -23,6 +24,7 @@ import sample.Main;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DepartmentListController implements Initializable, DataChangeListener {
@@ -30,6 +32,9 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
     private DepartmentService service;
 
+
+    @FXML
+    private TableColumn<Department,Department> tableColumnREMOVE;
     @FXML
     private TableView<Department> tableViewDepartment;
     @FXML
@@ -91,6 +96,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
         obsList = FXCollections.observableArrayList(list);
         tableViewDepartment.setItems(obsList);
         initEditButtons();
+        initRemoveButtons();
 
     }
 
@@ -151,4 +157,56 @@ public class DepartmentListController implements Initializable, DataChangeListen
         });
 
 
-    }}
+    }
+
+
+    private void initRemoveButtons() {
+        tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
+                    private final Button button = new Button("remove");
+                    @Override
+                    protected void updateItem(Department obj, boolean empty) {
+                        super.updateItem(obj, empty);
+                        if (obj == null) {
+                            setGraphic(null);
+                            return;
+                        }
+
+                        setGraphic(button);
+                        button.setOnAction(event -> removeEntity(obj));
+
+                    }
+                });
+
+    }
+
+
+        private void removeEntity(Department obj){
+
+            Optional<ButtonType> result = Alerts.showConfirmation("Confirmation","Are you sure to deleat?");
+            if(result.get()==ButtonType.OK){
+
+                if(service==null){
+
+                    throw new IllegalStateException("Service was null");
+
+                }
+
+                try{
+
+                    service.remove(obj);
+                }
+
+                catch(DbIntegrityException db){
+
+                    Alerts.showAlert("Error removing object",null,db.getMessage(), Alert.AlertType.ERROR);
+
+                }
+
+
+            }
+
+        }
+
+
+}
